@@ -1,0 +1,64 @@
+Instructions to run Code:
+https://seer.cancer.gov/data/
+Request and download Seer*Stat.
+Data is taken from Seer*Stat 8.42.
+
+Once logged in, File -> New -> Case Listing Session
+
+In the data, use Incidence - Seer Reseearch Data, 17 Registries, Nov 2022 Sub (2000-2020)
+In the Selection, edit and add the three selection statements:
+The below statements are formatted in: {Section.Variable} = <Chosen Values>
+	{Therapy.RX Summ-Surg/Rad Seq} = 'No radiation and/or cancer-directed surgery','Radiation prior to surgery','Radiation after surgery'
+	AND {Race, Sex, Year Dx.Year of diagnosis = '2020'
+	OR {Therapy.RX Summ-Surg/Rad Seq} = 'Radiation before and after surgery','Intraoperative radiation','Intraoperative rad with other rad before/after surgery','Surgery both before and after radiation','Surgery both before and after radiation'
+
+In the table choose columns:
+RX Summ-Surg/Rad Seq
+Age recode with <1 year olds
+Sex
+Race and origin recode (NHW, NHB, NHAIAN, NHAPI, Hispanic)
+Months from diagnosis to treatment
+TNM 7/CS v0204+ Schema recode
+Site recode ICD-O-3 2023 Revision
+Site recode ICD-O-3 2023 Revision Expanded
+CS Schema - AJCC 6th Edition
+Primary Site - labeled
+Primary Site
+Histologic Type ICD-O-3
+ICD-O-3 Hist/behav
+ICD-O-3 Hist/behav, malignant
+Site recode ICD-O-3/WHO 2008 (for SIRs)
+EOD Schema ID Recode (2010+)
+Site recode - rare tumors
+Tumor Size Summary (2016+)
+Regional nodes positive (1988+)
+Site - mal+ins (most detail)
+Site - malignant (most detail)
+
+In the sort:
+RX Summ-Surg/Rad Seq
+Age recode with <1 year olds
+
+In Output put any title.
+Session -> Execute
+
+Once the matrix opens click on it. There should be 434900 occurrences.
+At the navigation bar, go to Matrix -> Export -> Results as Text File..
+In the new box, click CSV defaults. Name the data file as 2020-extra_removed.csv
+
+From here we start python.
+We need to import the important libraries.
+In command line: pip install -r requirements.txt
+
+Once complete, running python preprocess.py, will give two new csv files: 2020-extra_removed_preprocessed.csv and 2020-extra_removed_preprocessed_target_binary.csv
+
+In the imblearn-classifiers-binary.py, choose if you want to run EasyEnsembleClassifier or BalancedRandomForestClassifier by changing the name variable to eec or randomforest respectively.
+In the mlp-binary.py, choose which hidden_layer you want to see by changing the hidden_layer variable.
+Please note that mlp-binary.py will fail to run classification reports if the class is not predicted correctly.
+
+If you wish to run non binary, the preprocess.py needs to have lines 52-58 commented out.
+The targets y file should not have binary tagged at the end.
+Run mlp.py
+
+Training your own model:
+The models are provided in .joblib format and loaded as the classifiers if they already exist. To train, please remove those files. Note that large training can take up to 5 hours.
